@@ -99,8 +99,8 @@ public:
   void parse();
 
 private:
-  const Scanner &m_scanner; // The scanner containing the tokenized stream
-  const SymbolTable &m_symbol_table; // Shared symbol table
+  [[maybe_unused]] const Scanner &m_scanner; // The scanner containing the tokenized stream
+  [[maybe_unused]] const SymbolTable &m_symbol_table; // Shared symbol table
   const std::vector<Token> &m_tokens; // The scanned, tokenized stream
 
   /**
