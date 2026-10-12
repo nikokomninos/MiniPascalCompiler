@@ -9,11 +9,11 @@ SymbolTable::SymbolTable() {
 
   // Install all predefined symbols
   for (const PredefinedSymbol &s : predefined_symbols) {
-    install_attribute(s.lexeme, s.symbol_type, DataType::None, s.token_type);
+    install_attribute(std::string{s.lexeme}, s.symbol_type, DataType::None, s.token_type);
   }
 }
 
-bool SymbolTable::declare(const std::string &name, SymbolType symbol_type,
+bool SymbolTable::declare(const std::string_view &name, SymbolType symbol_type,
                           DataType data_type) {
   const std::string normalized_name{normalize_name(name)};
 
@@ -26,7 +26,7 @@ bool SymbolTable::declare(const std::string &name, SymbolType symbol_type,
   return true;
 }
 
-std::optional<std::size_t> SymbolTable::lookup(const std::string &name) const {
+std::optional<std::size_t> SymbolTable::lookup(const std::string_view &name) const {
   const std::string normalized_name{normalize_name(name)};
 
   const auto name_entry{m_name_table.find(normalized_name)};
@@ -38,7 +38,7 @@ std::optional<std::size_t> SymbolTable::lookup(const std::string &name) const {
 }
 
 std::optional<TokenType>
-SymbolTable::lookup_predefined_token(const std::string &lexeme) const {
+SymbolTable::lookup_predefined_token(const std::string_view &lexeme) const {
   const auto attribute_index{lookup(lexeme)};
 
   if (!attribute_index)
@@ -59,7 +59,7 @@ SymbolTable::get_attribute(std::size_t attribute_index) const {
   return m_attribute_table.at(attribute_index);
 }
 
-std::string SymbolTable::normalize_name(const std::string &name) {
+std::string SymbolTable::normalize_name(const std::string_view &name) {
   std::string normalized{name};
 
   std::transform(
@@ -130,7 +130,7 @@ std::size_t SymbolTable::install_attribute(const std::string &normalized_name,
 }
 
 bool SymbolTable::declared_in_current_scope(
-    const std::string &normalized_name) const {
+    const std::string_view &normalized_name) const {
   const std::vector<std::string> &declared_names{
       m_scope_stack.back().declared_names};
 

@@ -1,6 +1,3 @@
-PROGRAM Sample (Input, Output);
-  CONST
-     x  = 15;
-     a123 = 10;
-  BEGIN
-  END;
+program demo; 
+begin 
+end .

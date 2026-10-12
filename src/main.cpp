@@ -1,5 +1,7 @@
+#include "parser.hpp"
 #include "scanner.hpp"
 #include "symbol_table.hpp"
+#include <exception>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -32,8 +34,17 @@ int main(int argc, char *argv[]) {
   SymbolTable symbol_table;
   Scanner scanner(src, symbol_table);
 
-  scanner.get_tokens();
-  scanner.print_token_stream();
+  scanner.tokenize_stream();
+  // scanner.print_token_stream();
+
+  Parser parser(scanner, symbol_table);
+
+  try {
+    parser.parse();
+  } catch (const std::exception &error) {
+    std::cerr << error.what() << '\n';
+    return 1;
+  }
 
   /*--- Symbol Table Tests --- */
 

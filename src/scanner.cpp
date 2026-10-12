@@ -6,12 +6,14 @@
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
+#include <string_view>
 
 namespace {
+constexpr std::size_t NUM_TOKEN_TYPES = 37;
 
 // Lookup table for printing token type names (since enum names cannot
 // be printed)
-inline constexpr std::array<std::string, 37> token_type_names{
+inline constexpr std::array<std::string_view, NUM_TOKEN_TYPES> token_type_names{
     "TOK_PROGRAM",    "TOK_PROCEDURE", "TOK_VAR",        "TOK_BEGIN",
     "TOK_END",        "TOK_IF",        "TOK_THEN",       "TOK_ELSE",
     "TOK_WHILE",      "TOK_DO",        "TOK_INTEGER",    "TOK_REAL",
@@ -28,9 +30,10 @@ inline constexpr std::array<std::string, 37> token_type_names{
 Scanner::Scanner(const std::string &src, const SymbolTable &symbol_table)
     : m_src{src}, m_symbol_table{symbol_table} {}
 
-void Scanner::get_tokens() {
+void Scanner::tokenize_stream() {
   std::string lexeme{};
-  [[maybe_unused]] std::size_t line_number{1}; // For future use
+  std::size_t line_number{1};
+  std::size_t lexeme_line{1};
 
   // Lambda function to look a character ahead without going out
   // of bounds
@@ -41,15 +44,16 @@ void Scanner::get_tokens() {
   for (std::size_t i{0}; i < m_src.size(); ++i) {
     const char c{m_src.at(i)};
 
-    if (c == '\n')
-      ++line_number;
-
     if (std::isspace(c)) {
-      push_lexeme(lexeme);
+      push_lexeme(lexeme, lexeme_line);
+      if (c == '\n')
+        ++line_number;
       continue;
     }
 
     if (std::isalnum(c)) {
+      if (lexeme.empty())
+        lexeme_line = line_number;
       lexeme.push_back(c);
       continue;
     }
@@ -64,7 +68,7 @@ void Scanner::get_tokens() {
     }
 
     // Symbols end the preceding lexeme and are pushed as their own tokens
-    push_lexeme(lexeme);
+    push_lexeme(lexeme, lexeme_line);
     std::string symbol{c};
     const char next{look_ahead(i)};
     if ((c == ':' && next == '=') ||
@@ -73,15 +77,15 @@ void Scanner::get_tokens() {
       symbol.push_back(next);
       ++i;
     }
-    m_tokens.emplace_back(symbol, get_token_type(symbol));
+    m_tokens.emplace_back(symbol, get_token_type(symbol), line_number);
   }
 
-  push_lexeme(lexeme);
+  push_lexeme(lexeme, lexeme_line);
 }
 
-void Scanner::push_lexeme(std::string &lexeme) {
+void Scanner::push_lexeme(std::string &lexeme, std::size_t line_number) {
   if (!lexeme.empty()) {
-    m_tokens.emplace_back(lexeme, get_token_type(lexeme));
+    m_tokens.emplace_back(lexeme, get_token_type(lexeme), line_number);
     lexeme.clear();
   }
 }
@@ -93,7 +97,7 @@ void Scanner::print_token_stream() const {
   }
 }
 
-TokenType Scanner::get_token_type(const std::string &lexeme) const {
+TokenType Scanner::get_token_type(const std::string_view &lexeme) const {
   // Checks the symbol table explicitly for pre-defined tokens
   if (const auto predefined_token{
           m_symbol_table.lookup_predefined_token(lexeme)}) {

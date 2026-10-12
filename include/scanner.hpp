@@ -31,7 +31,7 @@ public:
    *
    * The tokenized stream is stored in member variable m_tokens.
    */
-  void get_tokens();
+  void tokenize_stream();
 
   /**
    * @brief Prints the tokenized stream into a list of the following format:
@@ -39,6 +39,8 @@ public:
    * LEXEME : TOKENTYPE
    */
   void print_token_stream() const;
+
+  const std::vector<Token> &tokens() const { return m_tokens;  }
 
 private:
   std::string m_src;           // The original source stream
@@ -51,10 +53,11 @@ private:
    * check_token_type to determine the TokenType of the lexeme
    *
    * @param &lexeme a reference to the current lexeme string
+   * @param line_number the source line where the lexeme starts
    *
    * @see check_token_type()
    */
-  void push_lexeme(std::string &lexeme);
+  void push_lexeme(std::string &lexeme, std::size_t line_number);
 
   /**
    * @brief A helper function that determines the token type of a lexeme
@@ -63,5 +66,5 @@ private:
    *
    * @return The TokenType associated with the lexeme
    */
-  TokenType get_token_type(const std::string &lexeme) const;
+  TokenType get_token_type(const std::string_view &lexeme) const;
 };
