@@ -300,6 +300,7 @@ void Parser::parse() {
   std::vector<Symbol> stack{NonTerm::Program};
 
   while (!stack.empty()) {
+    // Remaining stack symbols require more input to complete the parse
     if (pos == m_tokens.size()) {
       throw std::logic_error(
           "pascalc - \033[31merror\033[0m: unexpected end of input after token on line " +
@@ -307,8 +308,10 @@ void Parser::parse() {
     }
 
     const Token &token = m_tokens.at(pos);
+    // Convert the scanner's token type to the grammar's lookahead terminal
     const auto converted_token_type = convert_token_type(token.type);
 
+    // Reject unrecognized lexemes before indexing the production table
     if (converted_token_type == Term::Error) {
       throw std::logic_error(
           "pascalc - \033[31merror\033[0m: illegal token type for lexeme: \n" +
@@ -325,6 +328,7 @@ void Parser::parse() {
       const std::size_t production_num =
           production_table.at(static_cast<size_t>(non_term))
               .at(static_cast<size_t>(converted_token_type));
+      // A zero entry means this non-terminal cannot accept the lookahead
       if (production_num == 0) {
         throw std::logic_error(
             "pascalc - \033[31merror\033[0m: no production for " +
@@ -396,6 +400,7 @@ Term Parser::convert_token_type(TokenType token_type) {
   case TokenType::TOK_REAL:
     return Term::Real;
 
+  // All comparison operators share the RelOp terminal in the grammar
   case TokenType::TOK_EQUAL:
   case TokenType::TOK_GREATER:
   case TokenType::TOK_LESS:
@@ -407,11 +412,13 @@ Term Parser::convert_token_type(TokenType token_type) {
   case TokenType::TOK_NOT:
     return Term::Not;
 
+  // OR shares the additive precedence level with plus and minus
   case TokenType::TOK_PLUS:
   case TokenType::TOK_MINUS:
   case TokenType::TOK_OR:
     return Term::AddOp;
 
+  // AND shares the multiplicative precedence level with multiply and divide
   case TokenType::TOK_MULTIPLY:
   case TokenType::TOK_DIVIDE:
   case TokenType::TOK_DIV:
