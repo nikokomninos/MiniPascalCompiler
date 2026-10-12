@@ -30,7 +30,7 @@ Scanner::Scanner(const std::string &src, const SymbolTable &symbol_table)
 
 void Scanner::get_tokens() {
   std::string lexeme{};
-  std::size_t line_number{1}; // For future use
+  [[maybe_unused]] std::size_t line_number{1}; // For future use
 
   // Lambda function to look a character ahead without going out
   // of bounds
