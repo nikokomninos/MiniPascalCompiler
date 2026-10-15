@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <string>
 
 enum class TokenType {
@@ -62,4 +63,5 @@ enum class TokenType {
 struct Token {
   std::string lexeme;
   TokenType type;
+  std::size_t line_number{1};
 };

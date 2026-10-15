@@ -4,6 +4,7 @@
 #include <array>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -12,14 +13,16 @@ enum class SymbolType { Keyword, Operator, Program, Variable, Procedure };
 enum class DataType { Unknown, None, Integer, Real };
 
 struct PredefinedSymbol {
-  std::string lexeme;
+  std::string_view lexeme;
   TokenType token_type;
   SymbolType symbol_type;
 };
 
+constexpr std::size_t NUM_PREDEFINED = 34;
+
 // List of predefined symbols that are installed into the symbol
 // table via its constructor
-inline constexpr std::array<PredefinedSymbol, 34> predefined_symbols{{
+inline constexpr std::array<PredefinedSymbol, NUM_PREDEFINED> predefined_symbols{{
     {"PROGRAM", TokenType::TOK_PROGRAM, SymbolType::Keyword},
     {"PROCEDURE", TokenType::TOK_PROCEDURE, SymbolType::Keyword},
     {"VAR", TokenType::TOK_VAR, SymbolType::Keyword},
@@ -97,7 +100,7 @@ public:
    * @return True if the name is not already declared in the current scope,
    * false otherwise
    */
-  bool declare(const std::string &name, SymbolType symbol_type,
+  bool declare(const std::string_view &name, SymbolType symbol_type,
                DataType data_type);
 
   /**
@@ -108,7 +111,7 @@ public:
    *
    * @return The index of the name in the attribute table, nullopt otherwise
    */
-  std::optional<std::size_t> lookup(const std::string &name) const;
+  std::optional<std::size_t> lookup(const std::string_view &name) const;
 
   /**
    * @brief Performs a lookup in the attribute table to check
@@ -124,7 +127,7 @@ public:
    * @see lookup(const std::string &name)
    */
   std::optional<TokenType>
-  lookup_predefined_token(const std::string &lexeme) const;
+  lookup_predefined_token(const std::string_view &lexeme) const;
 
   /**
    * @brief Retrieves the attribute entry at a given attribute index
@@ -170,7 +173,7 @@ private:
    *
    * @return The normalized name
    */
-  static std::string normalize_name(const std::string &name);
+  static std::string normalize_name(const std::string_view &name);
 
   /**
    * @brief Installs a name into the name table.
@@ -200,5 +203,5 @@ private:
    *
    * @return True if it already exists in the current scope, False otherwise
    */
-  bool declared_in_current_scope(const std::string &normalized_name) const;
+  bool declared_in_current_scope(const std::string_view &normalized_name) const;
 };

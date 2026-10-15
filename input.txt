@@ -1,6 +1,7 @@
-PROGRAM Sample (Input, Output);
-  CONST
-     x  = 15;
-     a123 = 10;
-  BEGIN
-  END;
+program demo; 
+
+var x: integer;
+
+begin
+  x := 5;
+end .
