@@ -2,6 +2,6 @@ program demo;
 
 var x: integer;
 
-begin 
+begin
   x := 5;
 end .
