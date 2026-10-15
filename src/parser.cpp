@@ -277,7 +277,6 @@ inline const auto productions = [] {
   table.at(44) = {Term::Num};
   table.at(45) = {Term::LeftParen, NonTerm::Expression, Term::RightParen};
   table.at(46) = {Term::Not, NonTerm::Factor};
-  // Extends the spreadsheet grammar so declarations can terminate at a block.
   table.at(47) = {}; // ProcedureDeclarations ::= epsilon
 
   return table;
